@@ -243,7 +243,9 @@ void func_scan(tree_node* node,scope *pre_scope)
 	pre_scope->next = current_scope;
 
 	current_scope->scope_lvl = pre_scope->scope_lvl +1;
+ 
 	//give name to scope
+	
 	current_scope->func_name = strdup(node->a->token);
 	current_scope->num_of_vars = num_of_var;
 	current_scope->return_value= strdup(node->c->a->token);
@@ -362,6 +364,11 @@ void tree_scan_single_dec(tree_node* node, smb_var ***SYMB_TBL, int* current_max
     }
     else if(!strcmp(node->token,"FUNC_DEC"))
     {
+		if(!(strcmp(node->a->a->token, "main"))) 
+		{
+		printf("Main function have to be at global scope\n"); 
+		exit(1);
+		}
 		//printf("FUNC_DEC\n");
 		if(find_func(node->a->a->token,current_scope->FUNC_SYMB_TBL,num_of_func))
 		{
