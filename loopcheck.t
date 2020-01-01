@@ -1,21 +1,15 @@
 
-======================================Processing tests/10.t======================================
-ERROR : no main func.
-======================================Processing tests/1.t======================================
+======================================Processing tests/17a-nw.t======================================
+ERROR, invalid * to P_INT and INT
+======================================Processing tests/17a-w.t======================================
 -OK-
-======================================Processing tests/2.t======================================
-ERROR, func foo already exist in scope
-======================================Processing tests/3.t======================================
-ERROR : no main func.
-======================================Processing tests/4.t======================================
-ERROR :var i dont exist in scope: foo
-======================================Processing tests/5.t======================================
-ERROR: identifier x alreary exist in current function.
-======================================Processing tests/6.t======================================
-ERROR :var e dont exist in scope: foo
-======================================Processing tests/7.t======================================
-ERROR: you can't to enter STRING to CHAR type.
-======================================Processing tests/8.t======================================
-ERROR :var x dont exist in scope: foo
-======================================Processing tests/9.t======================================
-ERROR :var k dont exist in scope: foo_4
+======================================Processing tests/17b-nw.t======================================
+ERROR, invalid * to P_CHAR and CHAR
+======================================Processing tests/18a-nw.t======================================
+ERROR, invalid &(addres) to P_INT.
+======================================Processing tests/18a-w.t======================================
+-OK-
+======================================Processing tests/19a-nw.t======================================
+ERROR, invalid *(pointer) to CHAR
+======================================Processing tests/19a-w.t======================================
+-OK-
