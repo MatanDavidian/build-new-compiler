@@ -660,7 +660,7 @@ void scan_stm(tree_node* node,scope *current_scope)
 			exit(1);
 		}
 	}
-	else if(!strcmp(node->token,"FUNC_CLL"))
+	else if(!strcmp(node->token,"FUNC_CALL"))
 	{
 		check_exp_type(node,current_scope);
 	}
