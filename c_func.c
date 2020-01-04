@@ -181,8 +181,15 @@ void make_symbol_table(linked_list_node* head) {
 		if(current_scope->next !=NULL && !strcmp(current->data->a->token,"main"))
 		{
 			//printf("func name %s\n",current->data->a->token);
-			//printf("params num %d\n",*(current_scope->next->FUNC_SYMB_TBL[0]->num_of_params));
-			if(*(current_scope->next->FUNC_SYMB_TBL[0]->num_of_params)!=0)
+			//printf("params num %d\n",*(current_scope->next->FUNC_SYMB_TBL[*num_of_func]->num_of_params));
+			/*
+			if(*(current_scope->next->FUNC_SYMB_TBL[*num_of_func-1]->num_of_params)!=0)
+			{
+				printf("ERROR : main number of params have to be zero\n");
+				exit(1);
+			}
+			*/
+			if(strcmp(current->data->b->token,"NONE PARAMS"))
 			{
 				printf("ERROR : main number of params have to be zero\n");
 				exit(1);
@@ -498,7 +505,7 @@ void add_row_to_symb_tbl(char* id_name,char* id_type,char* id_ass_type, char* id
 {
     //printf("add_row_to_symb_tbl\n");
     //printf("num_of_var: %d\n",*num_of_var);
-	//printf("current_max_num_of_vars: %d\n",*current_max_num_of_vars);
+    //printf("current_max_num_of_vars: %d\n",*current_max_num_of_vars);
     if(! (find_var(id_name, *SYMB_TBL, num_of_var)) )
     {
 		//printf("7\n");
@@ -662,7 +669,7 @@ void scan_stm(tree_node* node,scope *current_scope)
 	}
 	else if(!strcmp(node->token,"FUNC_CALL"))
 	{
-		check_exp_type(node,current_scope);
+		check_exp_type(node->a,current_scope);
 	}
 	else if(!strcmp(node->token,"BLOCK"))
 	{
@@ -1111,7 +1118,7 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 				printf("func name: %s\n",node->a->token);
 				printf("num of params: %d\n",num_of_params);
 				printf("num of args: %d\n", number_of_args);
-				printf("ERROR : num of params didnt much to num of args\n");
+				printf("ERROR : num of params didnt match to num of args\n");
 				exit(1);
 			}
 		}
@@ -1122,7 +1129,7 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 				printf("func name: %s\n",node->a->token);
 				printf("num of params: %d\n", 0);
 				printf("num of args: %d\n", number_of_args);
-				printf("ERROR : num of params didnt much to num of args\n");
+				printf("ERROR : num of params didnt match to num of args\n");
 				exit(1);
 			}
 		}
@@ -1142,7 +1149,7 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 			if(strcmp(function_params[i]->type,args_type[i]))//not equals
 			{
 				//printf("CCC\n");
-				printf("arg type(%s) didnt much to param type(%s).\n ",args_type[i],function_params[i]->type);
+				printf("arg type(%s) didnt match to param type(%s).\n ",args_type[i],function_params[i]->type);
 				exit(1);
 			}
 		}

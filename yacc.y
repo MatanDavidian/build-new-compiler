@@ -232,9 +232,9 @@ int main()
 	first_func = (linked_list_node*)malloc(sizeof(linked_list_node));
 	first_func->next = NULL;	//important end condition
 	int x =yyparse();
-	//print_list(first_func);
 	//printf("start\n");
 	make_symbol_table(first_func);
+	print_list(first_func);
 	
 	return x;
 }
