@@ -1,19 +1,28 @@
+#ifndef HEADER
+#define HEADER
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h> 
-#include "lex.yy.c"
+
 
 
 //---------------STRUCTS----------------------------------//
 	typedef struct tree_node
 	{
 		char* token;
+		char* trueLabel;
+		char* falseLabel;
+		char* nextLabel;
+		char* code;
+		char* var;
+		char** args_type;
+		int num_of_args;
 		struct tree_node* a;
 		struct tree_node* b;
 		struct tree_node* c;
 		struct tree_node* d;
-		
 	} tree_node;
 	typedef struct linked_list_node
 	{
@@ -97,3 +106,16 @@ scope* pop_scope(scope* head_scope);
 void check(scope*);
 void print_var_smb_tbl(int num_of_var,smb_var **SYMB_TBL,char*);
 void print_func_smb_tbl(int num_of_func,smb_func** FUNC_SYMB_TBL);
+
+
+///*********************   PART 3 ***********************************///
+char* freshLabel();
+char* freshVar();
+void scan_all_func(linked_list_node* head);
+void set_new_labels_to_stmnts(tree_node* node);
+void set_labels_to_stmnts_and_add_code(tree_node* node);
+void set_next_label(tree_node* node);
+void write_code(tree_node* node);
+char* param_as_bytes(tree_node* node);
+int num_of_args_p3(tree_node* node);
+#endif

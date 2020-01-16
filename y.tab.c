@@ -18,8 +18,12 @@
 #define YYPURE 0
 
 #line 2 "yacc.y"
+	#define _GNU_SOURCE
+ 	#include "lex.yy.c"
+	#include "part3.c"
 	#include "c_func.c"
-#line 5 "yacc.y"
+	#include "func.h"
+#line 9 "yacc.y"
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
@@ -31,7 +35,7 @@ typedef union {
     	char* chr;
 } YYSTYPE;
 #endif /* !YYSTYPE_IS_DECLARED */
-#line 35 "y.tab.c"
+#line 39 "y.tab.c"
 
 /* compatibility with bison */
 #ifdef YYPARSE_PARAM
@@ -525,7 +529,7 @@ typedef struct {
 } YYSTACKDATA;
 /* variables for the parser stack */
 static YYSTACKDATA yystack;
-#line 218 "yacc.y"
+#line 216 "yacc.y"
 /////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////C//////////////////////////////////////////////////////////
 int yyerror(char *e)
@@ -541,16 +545,107 @@ int yyerror(char *e)
 int main()
 {
 	first_func = (linked_list_node*)malloc(sizeof(linked_list_node));
-	first_func->next = NULL;	//important end condition
+	first_func->next = NULL;	//important - end condition
 	int x =yyparse();
 	//printf("start\n");
+	//print_list(first_func);
+	printf("PART 2\n");
 	make_symbol_table(first_func);
-	print_list(first_func);
+	printf("PART 3\n");
+	scan_all_func(first_func);
 	
 	return x;
 }
 
-#line 554 "y.tab.c"
+//<---------------------------linked_list-------------------------------------------------------->//
+void add_node(linked_list_node* old_head , tree_node* root){
+
+    linked_list_node* new_head = (linked_list_node*)malloc(sizeof(linked_list_node));
+    new_head->data = root;
+	new_head ->next = old_head;
+	first_func = new_head;
+}
+
+void print_list(linked_list_node* head) {
+    printf("(CODE\n");
+    linked_list_node * current = head;
+
+    while (current != NULL) {
+        print_tree(current->data,1);
+        current = current->next;
+    }
+    printf(")\n");
+}
+
+tree_node *mknode(char* token,tree_node *a,tree_node *b,tree_node *c,tree_node *d)
+{
+
+	tree_node* new_tree_node=(tree_node*)malloc(sizeof(tree_node));
+	char *newstr=strdup(token);
+	new_tree_node->a=a;
+	new_tree_node->b=b;
+	new_tree_node->c=c;
+	new_tree_node->d=d;
+	new_tree_node->token=newstr;
+	return new_tree_node;
+}
+tree_node *make_two_childs_node(char* token,tree_node *a,tree_node *b)
+{
+	return mknode(token,a,b,NULL,NULL);
+}
+tree_node *make_one_child_node(char* token,tree_node *a)
+{
+	return mknode(token,a,NULL,NULL,NULL);
+}
+tree_node *make_empty_node(char* token) 
+{
+	return mknode(token,NULL,NULL,NULL,NULL);
+}
+void tabs(int t){
+	for(int i=0;i<t;i++)
+		printf("\t");
+}
+void print_tree(tree_node* node,int n_tab){
+	if(node == NULL)
+		return;  
+
+	if(is_leaf(node)){
+		if(strcmp(node->token,"empty")){
+			tabs(n_tab);
+			printf("%s\n" , node->token);
+			}
+		return;
+	}
+	if(strcmp(node->token,"empty"))
+	{
+		tabs(n_tab);
+		printf("(%s\n" , node->token);
+		
+		print_tree(node->a,n_tab+1);
+		print_tree(node->b,n_tab+1);
+		print_tree(node->c,n_tab+1);
+		print_tree(node->d,n_tab+1);
+
+		tabs(n_tab);
+		if(strcmp(node->token,"empty"))
+			printf(")\n");
+	}
+	else
+	{
+		print_tree(node->a,n_tab);
+		print_tree(node->b,n_tab);
+		print_tree(node->c,n_tab);
+		print_tree(node->d,n_tab);
+    }
+
+}
+bool is_leaf(tree_node* node){
+    if(node->a == NULL && node->b == NULL && node->c == NULL && node->d == NULL)
+	return true;
+    return false;
+}
+
+#line 649 "y.tab.c"
 
 #if YYDEBUG
 #include <stdio.h>		/* needed for printf */
@@ -753,39 +848,39 @@ yyreduce:
     switch (yyn)
     {
 case 1:
-#line 40 "yacc.y"
+#line 44 "yacc.y"
 	{
 		add_node(first_func,yystack.l_mark[-1].node);
 	}
 break;
 case 2:
-#line 42 "yacc.y"
+#line 46 "yacc.y"
 	{yyval.node=NULL;}
 break;
 case 3:
-#line 44 "yacc.y"
+#line 48 "yacc.y"
 	{
 			yyval.node=mknode("PARAMS", yystack.l_mark[0].node, NULL, NULL, NULL);
 		}
 break;
 case 4:
-#line 47 "yacc.y"
+#line 51 "yacc.y"
 	{yyval.node=make_empty_node("NONE PARAMS");}
 break;
 case 5:
-#line 50 "yacc.y"
+#line 54 "yacc.y"
 	{
 			yyval.node=mknode("empty", yystack.l_mark[-3].node, make_empty_node(yystack.l_mark[-2].chr), yystack.l_mark[0].node, NULL);
 		}
 break;
 case 6:
-#line 54 "yacc.y"
+#line 58 "yacc.y"
 	{
 			yyval.node=mknode("empty", yystack.l_mark[-1].node, make_empty_node(yystack.l_mark[0].chr) , NULL, NULL);
 		}
 break;
 case 7:
-#line 61 "yacc.y"
+#line 63 "yacc.y"
 	{
 		char* str=strdup(yystack.l_mark[-2].chr);
 		strcat(str," ");
@@ -794,16 +889,16 @@ case 7:
 	}
 break;
 case 8:
-#line 67 "yacc.y"
+#line 69 "yacc.y"
 	{yyval.chr=yystack.l_mark[0].chr;}
 break;
 case 9:
-#line 69 "yacc.y"
+#line 70 "yacc.y"
 	{yyval.node=mknode("ARGS", yystack.l_mark[-2].node, yystack.l_mark[0].node, NULL, NULL);}
 break;
 case 10:
-#line 70 "yacc.y"
-	{yyval.node=mknode("empty", yystack.l_mark[0].node, NULL, NULL, NULL);}
+#line 71 "yacc.y"
+	{yyval.node=mknode("ARGS", yystack.l_mark[0].node, NULL, NULL, NULL);}
 break;
 case 11:
 #line 73 "yacc.y"
@@ -909,245 +1004,245 @@ case 34:
 break;
 case 35:
 #line 125 "yacc.y"
-	{yyval.node=mknode("empty",yystack.l_mark[-1].node,yystack.l_mark[0].node,NULL,NULL);}
+	{yyval.node=mknode("STMNT",yystack.l_mark[-1].node,yystack.l_mark[0].node,NULL,NULL);}
 break;
 case 36:
 #line 126 "yacc.y"
 	{yyval.node = NULL;}
 break;
 case 37:
-#line 129 "yacc.y"
+#line 128 "yacc.y"
 	{yyval.node=yystack.l_mark[-1].node;}
 break;
 case 38:
-#line 130 "yacc.y"
+#line 129 "yacc.y"
 	{yyval.node=mknode("FUNC_CALL",yystack.l_mark[-1].node,NULL,NULL,NULL);}
 break;
 case 39:
-#line 131 "yacc.y"
+#line 130 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;}
 break;
 case 40:
-#line 132 "yacc.y"
+#line 131 "yacc.y"
 	{yyval.node=mknode("RET",yystack.l_mark[-1].node,NULL,NULL,NULL);}
 break;
 case 41:
-#line 133 "yacc.y"
+#line 132 "yacc.y"
 	{yyval.node=mknode("DO_WHILE",yystack.l_mark[0].node,NULL,NULL,NULL);}
 break;
 case 42:
-#line 137 "yacc.y"
+#line 136 "yacc.y"
 	{yyval.node=mknode("BLOCK",yystack.l_mark[-2].node,yystack.l_mark[-1].node,NULL,NULL);}
 break;
 case 43:
-#line 140 "yacc.y"
+#line 139 "yacc.y"
 	{
 					yyval.node=mknode("FUNC_CALL",make_empty_node(yystack.l_mark[-3].chr),yystack.l_mark[-1].node,NULL,NULL);
 				}
 break;
 case 44:
-#line 144 "yacc.y"
+#line 143 "yacc.y"
 	{
 					yyval.node=mknode("FUNC_CALL",make_empty_node(yystack.l_mark[-2].chr),NULL,NULL,NULL);
 				}
 break;
 case 45:
-#line 148 "yacc.y"
+#line 147 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;}
 break;
 case 46:
-#line 148 "yacc.y"
+#line 147 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;}
 break;
 case 47:
-#line 150 "yacc.y"
+#line 149 "yacc.y"
 	{yyval.node=mknode("IF",yystack.l_mark[-2].node,yystack.l_mark[0].node,NULL,NULL);}
 break;
 case 48:
-#line 151 "yacc.y"
+#line 150 "yacc.y"
 	{yyval.node=mknode("IF-ELSE",yystack.l_mark[-4].node,yystack.l_mark[-2].node,yystack.l_mark[0].node,NULL);}
 break;
 case 49:
-#line 152 "yacc.y"
+#line 151 "yacc.y"
 	{yyval.node=mknode("WHILE",yystack.l_mark[-2].node,yystack.l_mark[0].node,NULL,NULL);}
 break;
 case 50:
-#line 153 "yacc.y"
+#line 152 "yacc.y"
 	{yyval.node=mknode("FOR",yystack.l_mark[-6].node,yystack.l_mark[-4].node,yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 51:
-#line 156 "yacc.y"
+#line 154 "yacc.y"
 	{yyval.node=mknode("IF-ELSE",yystack.l_mark[-4].node,yystack.l_mark[-2].node,yystack.l_mark[0].node,NULL);}
 break;
 case 52:
-#line 157 "yacc.y"
+#line 155 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;}
 break;
 case 53:
-#line 158 "yacc.y"
+#line 156 "yacc.y"
 	{yyval.node=mknode("WHILE",yystack.l_mark[-2].node,yystack.l_mark[0].node,NULL,NULL);}
 break;
 case 54:
-#line 159 "yacc.y"
+#line 157 "yacc.y"
 	{yyval.node=mknode("FOR",yystack.l_mark[-6].node,yystack.l_mark[-4].node,yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 55:
-#line 161 "yacc.y"
+#line 159 "yacc.y"
 	{yyval.node=mknode("empty",yystack.l_mark[-5].node,yystack.l_mark[-2].node,NULL,NULL);}
 break;
 case 56:
-#line 163 "yacc.y"
+#line 161 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;}
 break;
 case 57:
-#line 167 "yacc.y"
+#line 165 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;}
 break;
 case 58:
-#line 168 "yacc.y"
+#line 166 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;}
 break;
 case 59:
-#line 171 "yacc.y"
+#line 169 "yacc.y"
 	{yyval.node=mknode("REGULAR_ASS", make_one_child_node("ID",make_empty_node(yystack.l_mark[-2].chr)), yystack.l_mark[0].node, NULL, NULL);}
 break;
 case 60:
-#line 172 "yacc.y"
+#line 170 "yacc.y"
 	{yyval.node=mknode("PTR_ASS", make_one_child_node("ID",make_empty_node(yystack.l_mark[-2].chr)), yystack.l_mark[0].node, NULL, NULL);}
 break;
 case 61:
-#line 175 "yacc.y"
+#line 173 "yacc.y"
 	{yyval.node=mknode("STR_ASS", make_one_child_node("ID",make_empty_node(yystack.l_mark[-5].chr)), yystack.l_mark[-3].node, make_one_child_node("CHAR",make_empty_node(yystack.l_mark[0].node)), NULL);}
 break;
 case 62:
-#line 176 "yacc.y"
+#line 174 "yacc.y"
 	{yyval.node=mknode("STR_ASS", make_one_child_node("ID",make_empty_node(yystack.l_mark[-5].chr)), yystack.l_mark[-3].node, make_one_child_node("ID",make_empty_node(yystack.l_mark[0].chr)), NULL);}
 break;
 case 63:
-#line 180 "yacc.y"
+#line 178 "yacc.y"
 	{yyval.node=make_one_child_node("+",yystack.l_mark[0].node);}
 break;
 case 64:
-#line 181 "yacc.y"
+#line 179 "yacc.y"
 	{yyval.node=make_one_child_node("-",yystack.l_mark[0].node);}
 break;
 case 65:
-#line 182 "yacc.y"
+#line 180 "yacc.y"
 	{yyval.node=make_two_childs_node("(",yystack.l_mark[-1].node,make_empty_node(")"));}
 break;
 case 66:
-#line 183 "yacc.y"
+#line 181 "yacc.y"
 	{yyval.node=make_one_child_node("!",yystack.l_mark[0].node);}
 break;
 case 67:
-#line 184 "yacc.y"
+#line 182 "yacc.y"
 	{yyval.node=make_two_childs_node("+",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 68:
-#line 185 "yacc.y"
+#line 183 "yacc.y"
 	{yyval.node=make_two_childs_node("*",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 69:
-#line 186 "yacc.y"
+#line 184 "yacc.y"
 	{yyval.node=make_two_childs_node("-",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 70:
-#line 187 "yacc.y"
+#line 185 "yacc.y"
 	{yyval.node=make_two_childs_node("/",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 71:
-#line 188 "yacc.y"
+#line 186 "yacc.y"
 	{yyval.node=make_two_childs_node("&&",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 72:
-#line 189 "yacc.y"
+#line 187 "yacc.y"
 	{yyval.node=make_two_childs_node("||",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 73:
-#line 190 "yacc.y"
+#line 188 "yacc.y"
 	{yyval.node=make_two_childs_node(">",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 74:
-#line 191 "yacc.y"
+#line 189 "yacc.y"
 	{yyval.node=make_two_childs_node(">=",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 75:
-#line 192 "yacc.y"
+#line 190 "yacc.y"
 	{yyval.node=make_two_childs_node("<",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 76:
-#line 193 "yacc.y"
+#line 191 "yacc.y"
 	{yyval.node=make_two_childs_node("<=",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 77:
-#line 194 "yacc.y"
+#line 192 "yacc.y"
 	{yyval.node=make_two_childs_node("==",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 78:
-#line 195 "yacc.y"
+#line 193 "yacc.y"
 	{yyval.node=make_two_childs_node("!=",yystack.l_mark[-2].node,yystack.l_mark[0].node);}
 break;
 case 79:
-#line 197 "yacc.y"
+#line 195 "yacc.y"
 	{ yyval.node=make_one_child_node("STR_LEN", make_one_child_node("ID",make_empty_node(yystack.l_mark[-1].chr)));}
 break;
 case 80:
-#line 199 "yacc.y"
+#line 197 "yacc.y"
 	{yyval.node=yystack.l_mark[0].node;/**/}
 break;
 case 81:
-#line 201 "yacc.y"
+#line 199 "yacc.y"
 	{yyval.node=make_one_child_node("ADDRESS", make_one_child_node("ID",make_empty_node(yystack.l_mark[0].chr)));}
 break;
 case 82:
-#line 202 "yacc.y"
+#line 200 "yacc.y"
 	{yyval.node=make_two_childs_node("ADDRESS", make_one_child_node("ID",make_empty_node(yystack.l_mark[-3].chr)), make_one_child_node("IN_PLACE",yystack.l_mark[-1].node));}
 break;
 case 83:
-#line 204 "yacc.y"
+#line 202 "yacc.y"
 	{yyval.node=make_one_child_node("PTR",make_one_child_node("ID",make_empty_node(yystack.l_mark[0].chr)));}
 break;
 case 84:
-#line 205 "yacc.y"
+#line 203 "yacc.y"
 	{yyval.node=make_two_childs_node("PTR",make_one_child_node("ID",make_empty_node(yystack.l_mark[-3].chr)),yystack.l_mark[-1].node);}
 break;
 case 85:
-#line 206 "yacc.y"
+#line 204 "yacc.y"
 	{yyval.node=make_two_childs_node("PTR",make_one_child_node("ID",make_empty_node(yystack.l_mark[-3].chr)),yystack.l_mark[-1].node);}
 break;
 case 86:
-#line 207 "yacc.y"
+#line 205 "yacc.y"
 	{yyval.node=make_two_childs_node("ID", make_one_child_node("ID",make_empty_node(yystack.l_mark[-3].chr)), make_one_child_node("IN_PLACE",yystack.l_mark[-1].node));}
 break;
 case 87:
-#line 208 "yacc.y"
+#line 206 "yacc.y"
 	{yyval.node=make_one_child_node("ID",make_empty_node(yystack.l_mark[0].chr));}
 break;
 case 88:
-#line 210 "yacc.y"
+#line 208 "yacc.y"
 	{yyval.node=make_one_child_node("INT",make_empty_node(yystack.l_mark[0].node));}
 break;
 case 89:
-#line 211 "yacc.y"
+#line 209 "yacc.y"
 	{yyval.node=make_one_child_node("BOOL",make_empty_node(yystack.l_mark[0].node));}
 break;
 case 90:
-#line 212 "yacc.y"
+#line 210 "yacc.y"
 	{yyval.node=make_one_child_node("REAL",make_empty_node(yystack.l_mark[0].node));}
 break;
 case 91:
-#line 213 "yacc.y"
+#line 211 "yacc.y"
 	{yyval.node=make_one_child_node("CHAR",make_empty_node(yystack.l_mark[0].node));}
 break;
 case 92:
-#line 214 "yacc.y"
+#line 212 "yacc.y"
 	{yyval.node=make_one_child_node("STRING",make_empty_node(yystack.l_mark[0].node));}
 break;
 case 93:
-#line 215 "yacc.y"
+#line 213 "yacc.y"
 	{yyval.node=make_empty_node("NULL");}
 break;
-#line 1151 "y.tab.c"
+#line 1246 "y.tab.c"
     }
     yystack.s_mark -= yym;
     yystate = *yystack.s_mark;

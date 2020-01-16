@@ -1,5 +1,9 @@
 %{
+	#define _GNU_SOURCE
+ 	#include "lex.yy.c"
+	#include "part3.c"
 	#include "c_func.c"
+	#include "func.h"
 %}
 
 %union {
@@ -54,8 +58,6 @@ parameter_list:	type parameter_list_same_type ';' parameter_list
 		{
 			$$=mknode("empty", $1, make_empty_node($2) , NULL, NULL);
 		};
-
-
 parameter_list_same_type: 
 	IDENTIFIER ',' parameter_list_same_type 
 	{
@@ -65,10 +67,8 @@ parameter_list_same_type:
 		$$=str;
 	}|
 	IDENTIFIER{$$=$1;};
-
 argument_list:	expression ',' argument_list {$$=mknode("ARGS", $1, $3, NULL, NULL);}	|
-		expression{$$=mknode("empty", $1, NULL, NULL, NULL);};
-
+		expression{$$=mknode("ARGS", $1, NULL, NULL, NULL);};
 type: 
 	P_CHAR{$$=make_empty_node("P_CHAR");} | 
 	P_REAL{$$=make_empty_node("P_REAL");} | 
@@ -122,9 +122,8 @@ string_declaration:
 ////////////////////////STATEMENTS///////////////////////////////////////////////////////////
 
 statements: 	
-	stmnt statements {$$=mknode("empty",$1,$2,NULL,NULL);}|
+	stmnt statements {$$=mknode("STMNT",$1,$2,NULL,NULL);}|
 	{$$ = NULL;};
-
 
 simple_statement: 	assignment_statement ';' {$$=$1;}|
 			function_call_statement ';' {$$=mknode("FUNC_CALL",$1,NULL,NULL,NULL);}|
@@ -152,7 +151,6 @@ unmatched_stmnt: IF '(' expression ')' stmnt {$$=mknode("IF",$3,$5,NULL,NULL);}|
 		 WHILE '(' expression ')' unmatched_stmnt {$$=mknode("WHILE",$3,$5,NULL,NULL);}|
 		 FOR '(' assignment_statement ';' expression ';' assignment_statement ')' unmatched_stmnt {$$=mknode("FOR",$3,$5,$7,$9);};
 		 
-
 matched_stmnt: 	IF '(' expression ')' matched_stmnt ELSE  matched_stmnt {$$=mknode("IF-ELSE",$3,$5,$7,NULL);}|
 		simple_statement {$$=$1;}|
 		WHILE '(' expression ')' matched_stmnt {$$=mknode("WHILE",$3,$5,NULL,NULL);}|
@@ -230,12 +228,103 @@ int yyerror(char *e)
 int main()
 {
 	first_func = (linked_list_node*)malloc(sizeof(linked_list_node));
-	first_func->next = NULL;	//important end condition
+	first_func->next = NULL;	//important - end condition
 	int x =yyparse();
 	//printf("start\n");
+	//print_list(first_func);
+	printf("PART 2\n");
 	make_symbol_table(first_func);
-	print_list(first_func);
+	printf("PART 3\n");
+	scan_all_func(first_func);
 	
 	return x;
+}
+
+//<---------------------------linked_list-------------------------------------------------------->//
+void add_node(linked_list_node* old_head , tree_node* root){
+
+    linked_list_node* new_head = (linked_list_node*)malloc(sizeof(linked_list_node));
+    new_head->data = root;
+	new_head ->next = old_head;
+	first_func = new_head;
+}
+
+void print_list(linked_list_node* head) {
+    printf("(CODE\n");
+    linked_list_node * current = head;
+
+    while (current != NULL) {
+        print_tree(current->data,1);
+        current = current->next;
+    }
+    printf(")\n");
+}
+
+tree_node *mknode(char* token,tree_node *a,tree_node *b,tree_node *c,tree_node *d)
+{
+
+	tree_node* new_tree_node=(tree_node*)malloc(sizeof(tree_node));
+	char *newstr=strdup(token);
+	new_tree_node->a=a;
+	new_tree_node->b=b;
+	new_tree_node->c=c;
+	new_tree_node->d=d;
+	new_tree_node->token=newstr;
+	return new_tree_node;
+}
+tree_node *make_two_childs_node(char* token,tree_node *a,tree_node *b)
+{
+	return mknode(token,a,b,NULL,NULL);
+}
+tree_node *make_one_child_node(char* token,tree_node *a)
+{
+	return mknode(token,a,NULL,NULL,NULL);
+}
+tree_node *make_empty_node(char* token) 
+{
+	return mknode(token,NULL,NULL,NULL,NULL);
+}
+void tabs(int t){
+	for(int i=0;i<t;i++)
+		printf("\t");
+}
+void print_tree(tree_node* node,int n_tab){
+	if(node == NULL)
+		return;  
+
+	if(is_leaf(node)){
+		if(strcmp(node->token,"empty")){
+			tabs(n_tab);
+			printf("%s\n" , node->token);
+			}
+		return;
+	}
+	if(strcmp(node->token,"empty"))
+	{
+		tabs(n_tab);
+		printf("(%s\n" , node->token);
+		
+		print_tree(node->a,n_tab+1);
+		print_tree(node->b,n_tab+1);
+		print_tree(node->c,n_tab+1);
+		print_tree(node->d,n_tab+1);
+
+		tabs(n_tab);
+		if(strcmp(node->token,"empty"))
+			printf(")\n");
+	}
+	else
+	{
+		print_tree(node->a,n_tab);
+		print_tree(node->b,n_tab);
+		print_tree(node->c,n_tab);
+		print_tree(node->d,n_tab);
+    }
+
+}
+bool is_leaf(tree_node* node){
+    if(node->a == NULL && node->b == NULL && node->c == NULL && node->d == NULL)
+	return true;
+    return false;
 }
 

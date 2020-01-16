@@ -1,5 +1,5 @@
 #!/bin/bash
 rm mylang
-yacc -d yacc.y
+yacc -d  yacc.y
 lex lex.l 
 cc -o mylang y.tab.c -ll -Ly -w

@@ -1,111 +1,5 @@
 #include "func.h"
-tree_node *mknode(char* token,tree_node *a,tree_node *b,tree_node *c,tree_node *d)
-{
 
-	tree_node* new_tree_node=(tree_node*)malloc(sizeof(tree_node));
-	char *newstr=strdup(token);
-	new_tree_node->a=a;
-	new_tree_node->b=b;
-	new_tree_node->c=c;
-	new_tree_node->d=d;
-	new_tree_node->token=newstr;
-	return new_tree_node;
-}
-tree_node *make_two_childs_node(char* token,tree_node *a,tree_node *b)
-{
-	tree_node* new_tree_node=(tree_node*)malloc(sizeof(tree_node));
-	char *newstr=strdup(token);
-	new_tree_node->a=a;
-	new_tree_node->b=b;
-	new_tree_node->c=NULL;
-	new_tree_node->d=NULL;
-	new_tree_node->token=newstr;
-	return new_tree_node;
-}
-tree_node *make_one_child_node(char* token,tree_node *a)
-{
-	tree_node* new_tree_node=(tree_node*)malloc(sizeof(tree_node));
-	char *newstr=strdup(token);
-	new_tree_node->a=a;
-	new_tree_node->b=NULL;
-	new_tree_node->c=NULL;
-	new_tree_node->d=NULL;
-	new_tree_node->token=newstr;
-	return new_tree_node;
-}
-tree_node *make_empty_node(char* token) 
-{
-	tree_node* new_tree_node=(tree_node*)malloc(sizeof(tree_node));
-	char *newstr=strdup(token);
-	new_tree_node->a=NULL;
-	new_tree_node->b=NULL;
-	new_tree_node->c=NULL;
-	new_tree_node->d=NULL;
-	new_tree_node->token=newstr;
-	return new_tree_node;
-}
-void tabs(int t){
-	for(int i=0;i<t;i++)
-		printf("\t");
-}
-void print_tree(tree_node* node,int n_tab){
-	if(node == NULL)
-		return;  
-
-	if(is_leaf(node)){
-		if(strcmp(node->token,"empty")){
-			tabs(n_tab);
-			printf("%s\n" , node->token);
-			}
-		return;
-	}
-	if(strcmp(node->token,"empty"))
-	{
-		tabs(n_tab);
-		printf("(%s\n" , node->token);
-		
-		print_tree(node->a,n_tab+1);
-		print_tree(node->b,n_tab+1);
-		print_tree(node->c,n_tab+1);
-		print_tree(node->d,n_tab+1);
-
-		tabs(n_tab);
-		if(strcmp(node->token,"empty"))
-			printf(")\n");
-	}
-	else
-	{
-		print_tree(node->a,n_tab);
-		print_tree(node->b,n_tab);
-		print_tree(node->c,n_tab);
-		print_tree(node->d,n_tab);
-    }
-
-}
-bool is_leaf(tree_node* node){
-    if(node->a == NULL && node->b == NULL && node->c == NULL && node->d == NULL)
-	return true;
-    return false;
-}
-//<---------------------------linked_list-------------------------------------------------------->//
-void add_node(linked_list_node* old_head , tree_node* root){
-
-    linked_list_node* new_head = (linked_list_node*)malloc(sizeof(linked_list_node));
-    new_head->data = root;
-	new_head ->next = old_head;
-	first_func = new_head;
-}
-
-void print_list(linked_list_node* head) {
-    printf("(CODE\n");
-    linked_list_node * current = head;
-
-    while (current != NULL) {
-        print_tree(current->data,1);
-        current = current->next;
-    }
-    printf(")\n");
-}
 //<---------------------------tree_scan---------------------------------------------------------->//
 void make_symbol_table(linked_list_node* head) {
     //printf("0.1\n");
@@ -161,18 +55,6 @@ void make_symbol_table(linked_list_node* head) {
 		{
 			tree_scan_params_to_func_smb(current->data->b->a,&((current_scope->FUNC_SYMB_TBL)[(*num_of_func)]->params),max_num_of_params,(current_scope->FUNC_SYMB_TBL)[(*num_of_func)]->num_of_params);
 		}
-		//printf("0.4.3\n");
-		//current_scope->num_of_funcs=(int*)malloc(sizeof(int));
-		//*(current_scope->num_of_funcs)=num_of_func;
-		//printf("scope_name: %s\n",current_scope->func_name);
-		//printf("num_of_func: %d\n",*num_of_func);
-		//printf("func name: %s\t return_value: %s\n", (current_scope->FUNC_SYMB_TBL)[*num_of_func]->name, (current_scope->FUNC_SYMB_TBL)[*num_of_func]->return_value);
-		//printf("0.5\n");
-		//printf("scope_lvl: %d\n",current_scope->scope_lvl);
-		//printf("scope_address: %d\n",current_scope);
-		//scan all dec and stmnts in func
-		//printf("GLOBAL SCOPE\n");
-		//printf("FUNC NAME: %s\n",current->data->a->token);
 		if(current->data != NULL)
 		{
 			*num_of_func = *num_of_func +1;
@@ -180,21 +62,11 @@ void make_symbol_table(linked_list_node* head) {
 		}
 		if(current_scope->next !=NULL && !strcmp(current->data->a->token,"main"))
 		{
-			//printf("func name %s\n",current->data->a->token);
-			//printf("params num %d\n",*(current_scope->next->FUNC_SYMB_TBL[*num_of_func]->num_of_params));
-			/*
-			if(*(current_scope->next->FUNC_SYMB_TBL[*num_of_func-1]->num_of_params)!=0)
-			{
-				printf("ERROR : main number of params have to be zero\n");
-				exit(1);
-			}
-			*/
 			if(strcmp(current->data->b->token,"NONE PARAMS"))
 			{
 				printf("ERROR : main number of params have to be zero\n");
 				exit(1);
 			}
-			//printf("main return value: %s\n",current->data->c->a->token);
 			if(strcmp(current->data->c->a->token,"VOID"))//not eqaul
 			{
 				printf("ERROR : main have to be void\n");
@@ -205,8 +77,6 @@ void make_symbol_table(linked_list_node* head) {
 		//move to next func
 		
         current = current->next;
-		//printf("current->next: %d\n",current->next);
-		//printf("0.6\n");
     }
 	if(main_exist==false)
 		{
@@ -298,10 +168,8 @@ void tree_scan_params_to_var_smb(tree_node* node, smb_var ***SYMB_TBL, int* curr
 				{
 					id_name[k++] = ids_name[j];
 				}
-				//printf("a.start: %d\n",start);
-				//printf("a.end: %d\n", end);
+
 				id_name[k]='\0';
-				//printf("%s\n",id_name);		
 				add_row_to_symb_tbl(id_name, type, type, "???", 0, SYMB_TBL, current_max_num_of_vars, num_of_var);
 				k=0;
 				start=end+1;
@@ -333,8 +201,6 @@ void tree_scan_params_to_func_smb(tree_node* node, smb_var*** func_params,int* c
 				{
 					id_name[k++] = ids_name[j];
 				}
-				//printf("a.start: %d\n",start);
-				//printf("a.end: %d\n", end);
 				id_name[k]='\0';
 				//printf("%s\n",id_name);		
 				add_row_to_symb_tbl(id_name, type, type, "???", 0, func_params, current_max_num_of_params, num_of_param);
@@ -398,9 +264,6 @@ void tree_scan_single_dec(tree_node* node, smb_var ***SYMB_TBL, int* current_max
 		* max_num_of_params=2;
 
 		(*func_table)[(*num_of_func)]->params= (smb_var**)malloc(sizeof(int)*(* max_num_of_params));
-		//printf("before tree_scan_params_to_func_smb\n");
-		//printf("num of params: %d\n",*(*func_table)[(*num_of_func)]->num_of_params);
-		//printf("max_num_of_params: %d\n",*max_num_of_params);
 		if(node->a->b->a!=NULL)
 		{
 			tree_scan_params_to_func_smb(node->a->b->a,&((*func_table)[(*num_of_func)]->params),max_num_of_params,(*func_table)[(*num_of_func)]->num_of_params);
@@ -409,8 +272,6 @@ void tree_scan_single_dec(tree_node* node, smb_var ***SYMB_TBL, int* current_max
 		{
 			(*func_table)[(*num_of_func)]->params=NULL;
 		}
-		//printf("--------------------------------(*func_table)[%d]->name: %s\n",*num_of_func,(*func_table)[(*num_of_func)]->name);
-		//printf("--------------------------------(*func_table)[%d]->return_value: %s\n",*num_of_func,(*func_table)[(*num_of_func)]->return_value);
 		*num_of_func = *num_of_func +1;
 		func_scan(node->a,current_scope);
 		
@@ -422,9 +283,6 @@ void scan_var_dec(tree_node* node,char type[10], smb_var ***SYMB_TBL, int* curre
     char* value;
     int length;
     do{
-		//printf("dec1 on: %s %s\n",node->token,node->a->token);
-		//printf("4.var_dec\n");
-		//printf("%s\n",node->token);
 		if(!strcmp(node->token,"VAR"))
 		{
 			add_row_to_symb_tbl(node->a->token,type,type,"???",0, SYMB_TBL, current_max_num_of_vars, num_of_var);
@@ -452,8 +310,6 @@ void scan_str_dec(tree_node* node,char type[10], smb_var ***SYMB_TBL, int* curre
 {
 	//printf("scan_str_dec\n");
     do{
-		//printf("4.str_dec\n");
-		//printf("4. node->token :%s\n",node->token);
 		if(strcmp(check_exp_type(node->b,current_scope),"INT"))
 		{
 			printf("ERROR: in operator [] can be only integer.\n");
@@ -480,9 +336,6 @@ bool find_func(char* id_name, smb_func **FUNC_SYMB_TBL, int* num_of_funcs)
     //printf("***find_func***\n");
     for(int i=0; i<(*num_of_funcs) ;i++)
     {
-		//printf("*****************************6.i: %d\n",i);
-		//printf("*****************************6.id_name: %s\n",id_name);
-		//printf("*****************************6.FUNC_SYMB_TBL[i]->name: %s\n",FUNC_SYMB_TBL[i]->name);
 		if(!strcmp(id_name,FUNC_SYMB_TBL[i]->name))
 			return true;
     }
@@ -491,11 +344,8 @@ bool find_func(char* id_name, smb_func **FUNC_SYMB_TBL, int* num_of_funcs)
 }
 bool find_var(char* id_name, smb_var **SYMB_TBL, int* num_of_var)
 {
-    //printf("find_var\n");
     for(int i=0; i<(*num_of_var) ;i++)
     {
-	//printf("6.id_name: %s\n",id_name);
-	//printf("6.SYMB_TBL[i]->name: %s\n",SYMB_TBL[i]->name);
 		if(!strcmp(id_name,SYMB_TBL[i]->name))
 			return true;
     }
@@ -503,41 +353,25 @@ bool find_var(char* id_name, smb_var **SYMB_TBL, int* num_of_var)
 }
 void add_row_to_symb_tbl(char* id_name,char* id_type,char* id_ass_type, char* id_val, int id_len, smb_var ***SYMB_TBL, int* current_max_num_of_vars, int* num_of_var)
 {
-    //printf("add_row_to_symb_tbl\n");
-    //printf("num_of_var: %d\n",*num_of_var);
-    //printf("current_max_num_of_vars: %d\n",*current_max_num_of_vars);
     if(! (find_var(id_name, *SYMB_TBL, num_of_var)) )
     {
-		//printf("7\n");
 		if(*num_of_var + 1 == *current_max_num_of_vars)
 		{
 			*current_max_num_of_vars *= 2;
 			(*SYMB_TBL)=(smb_var **)realloc(*SYMB_TBL, sizeof(smb_var *) * (*current_max_num_of_vars));
 		}
-		//printf("8\n");
-		//printf("name: %s \n",id_name);
 		(*SYMB_TBL)[*num_of_var]= (smb_var*)malloc(sizeof(smb_var));
-		(*SYMB_TBL)[*num_of_var]->name = strdup(id_name);//
-		//printf("8.1\n");
-		//printf("type: %s \n",id_type);
-		//check types
+		(*SYMB_TBL)[*num_of_var]->name = strdup(id_name);
 		if(!strcmp(id_ass_type,"NONE") || !strcmp(id_ass_type,id_type))
-			(*SYMB_TBL)[* num_of_var]->type = strdup(id_type);//
-		//printf("8.2\n");
-		//printf("value: %s \n",id_val);
-
+			(*SYMB_TBL)[* num_of_var]->type = strdup(id_type);
 		if(strcmp(id_val,"???"))
 			(*SYMB_TBL)[* num_of_var]->initialized=true;
 		else
 			(*SYMB_TBL)[* num_of_var]->initialized=false;
+		(*SYMB_TBL)[* num_of_var]->value = strdup(id_val);
 
-		(*SYMB_TBL)[* num_of_var]->value = strdup(id_val);//
-		//printf("8.3\n");
-		//printf("length: %d \n",id_len);
-		(*SYMB_TBL)[* num_of_var]->length = id_len;//
-		//printf("8.4\n");
+		(*SYMB_TBL)[* num_of_var]->length = id_len;
 		*num_of_var = *num_of_var + 1;
-
     }
 	else
 	{
@@ -566,7 +400,6 @@ void tree_scan_stms(tree_node* node,scope *current_scope, bool func)
 }
 void scan_stm(tree_node* node,scope *current_scope)
 {
-	//printf("**********************scan_stm: %s\n",node->token);
 	if(!strcmp(node->token,"IF"))
 	{
 		if(strcmp(check_exp_type(node->a,current_scope),"BOOL"))
@@ -669,6 +502,11 @@ void scan_stm(tree_node* node,scope *current_scope)
 	}
 	else if(!strcmp(node->token,"FUNC_CALL"))
 	{
+		//if(node->b!=NULL && strcmp(node->b->token,"FUNC_CALL"))
+		//{
+			node->a->args_type= types_of_args(node->a->b ,current_scope);
+			//printf("PART 2: -------- %s -------------\n",node->a->args_type[0]);
+		//}
 		check_exp_type(node->a,current_scope);
 	}
 	else if(!strcmp(node->token,"BLOCK"))
@@ -727,7 +565,6 @@ void block_stmnt_scan(tree_node* node,scope *pre_scope)
 	//create link list of scopes
 	current_scope->pre = pre_scope;
 	pre_scope->next = current_scope;
-
 	current_scope->scope_lvl = pre_scope->scope_lvl +1;
 	//give name to scope
 	current_scope->num_of_vars = num_of_var;
@@ -743,9 +580,7 @@ void block_stmnt_scan(tree_node* node,scope *pre_scope)
 //<---------------------------check exp------------------------------------------------------------------->//
 char* check_exp_type(tree_node* node,scope *current_scope)
 { 
-	//printf("check_exp_type\n");
 	bool flag1=false, flag2=false;
-	//printf("token: %s\n",node->token);
 	if(!strcmp(node->token ,"INT")) return "INT";
 	else if(!strcmp(node->token ,"REAL")) return "REAL";
 	else if(!strcmp(node->token ,"P_CHAR")) return "P_CHAR";
@@ -1022,16 +857,6 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 			printf("ERROR, invalid [%s], in [] operator can be only int type .\n", check_exp_type(node->b->a, current_scope)); 
 			exit(1);
 		}
-		/*
-		if(flag1)
-		{
-			printf("ERROR, invalid &(addres) to %s[].\n", check_exp_type(node->a, current_scope)); exit(1);
-		}
-		if(flag2)
-		{
-			printf("ERROR, invalid [%s], in [] operator can be only int type .\n", check_exp_type(node->b->a, current_scope)); exit(1);
-		}
-		*/
 		return "P_CHAR";
 	}
 	// POINTER
@@ -1043,13 +868,8 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 			return "REAL";
 		else if(!strcmp(check_exp_type(node->a, current_scope),"P_CHAR"))
 			return "CHAR";
-			/*
-		else if(!strcmp(check_exp_type(node->a, current_scope),"STRING"))//?????
-			return "CHAR";
-			*/
 		else
 		{
-			//printf("type: %s \n",check_exp_type(node->a, current_scope));
 			printf("ERROR, invalid *(pointer) to %s\n", check_exp_type(node->a, current_scope));
 			 exit(1);
 		}
@@ -1059,7 +879,6 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 	{ 
 		if(strcmp(check_exp_type(node->b, current_scope),"INT"))
 			{
-				//printf("type: %s \n",check_exp_type(node->a, current_scope));
 				printf("ERROR, in pointer arithmetic you only can add or subtract from a pointer integer number.\n");
 				exit(1);
 			}
@@ -1084,16 +903,6 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 			printf("ERROR, invalid [%s] .\n", check_exp_type(node->b->a, current_scope)); 
 			exit(1);
 		}
-		/*
-		if(flag1)
-		{
-			printf("ERROR, invalid [] to %s.\n", check_exp_type(node->a, current_scope));
-		}
-		if(flag2)
-		{
-			printf("ERROR, invalid [%s] .\n", check_exp_type(node->b->a, current_scope)); exit(1);
-		}
-		*/
 		return "CHAR";
 	}
 	// IDENTIFIER
@@ -1101,15 +910,11 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 	{ 
 		return identifier_type(node->a->token, current_scope);
 	}
-
 	// FUNC RETURN TYPE
 	else if(!strcmp(node->token ,"FUNC_CALL"))
 	{ 
-		//printf("****FUNC_CALL****\n");
-		//printf("*check num of args*\n");
-		//printf("num of args: %d\n", num_of_args(node->b));
-		//printf("num of params: %d\n",num_of_params0(node->a->token, current_scope));
 		int number_of_args = num_of_args(node->b);
+		//node->num_of_args=number_of_args;
 		int num_of_params = num_of_params0(node->a->token, current_scope);
 		if(node->b!=NULL)
 		{
@@ -1133,51 +938,31 @@ char* check_exp_type(tree_node* node,scope *current_scope)
 				exit(1);
 			}
 		}
-		//printf("*num of args ok*\n");
-		//printf("*check type of args*\n");
-
 		smb_var** function_params;
-		//printf("*get type of params*\n");
 		function_params= func_params(node->a->token,current_scope);
-		//printf("*get type of args*\n");
 		char** args_type = types_of_args(node->b ,current_scope);
-		//printf("*types geted*\n");
+		//node->args_type=args_type;
 		for(int i =0;i< number_of_args; i++)
 		{
-			//printf("args_type[%d] : %s\n",i,args_type[i]);
-			//printf("function_params[%d]->type : %s\n",i,function_params[i]->type);
 			if(strcmp(function_params[i]->type,args_type[i]))//not equals
 			{
-				//printf("CCC\n");
 				printf("arg type(%s) didnt match to param type(%s).\n ",args_type[i],function_params[i]->type);
 				exit(1);
 			}
 		}
-		//printf("*type of args ok*\n");
-		//printf("*********func name in call func: %s\n",node->a->token);
 		return func_type(node->a->token, current_scope);
-		
 	}
-	
 	return "ON WORKING";
 }
 char* identifier_type(char* id_name,scope* current_scope)
 {
-	//printf("-----------------------------------identifier_type\n");
 	scope* temp = current_scope;
-	//printf("10.ID: %s\n", id_name);
 	char *type;
 	while(temp != NULL)
 	{
-
-		//printf("------------search var on scope lvl: %d --------------\n", temp->scope_lvl);
-		//printf("------------search var on scope address: %d --------------\n", temp);
-		//printf("scope func_name: %s\n",temp->func_name);
-		//printf("scope num of vars: %d\n",*(temp->num_of_vars));
 		type = find_var_type(id_name,temp->VAR_SYMB_TBL,*(temp->num_of_vars));
 		if(strcmp(type,"NONE"))//not equal
 			return type;
-		//printf("------------not found var on scope lvl: %d --------------\n", temp->scope_lvl);
 		temp = temp->pre;
 	}
 	printf("ERROR :var %s dont exist in scope: %s\n",id_name,current_scope->func_name);
@@ -1185,22 +970,13 @@ char* identifier_type(char* id_name,scope* current_scope)
 }
 char* find_var_type(char* id_name, smb_var **SYMB_TBL, int num_of_var)
 {
-	//printf("--------------------------------find_var_type\n");
-    //printf("16.num_of_var : %d\n",num_of_var);
     for(int i=0; i<num_of_var ;i++)
     {
-		//printf("16.i: %d\n",i);
-		//printf("16.id_name: %s\n",id_name);
-		//printf("16.SYMB_TBL[i]->type: %s\n",SYMB_TBL[i]->type);
-		//printf("16.SYMB_TBL[i]->name: %s\n",SYMB_TBL[i]->name);
 		if(!strcmp(id_name,SYMB_TBL[i]->name))
 		{
-			//printf("FIND PARAM\n");
-			//printf("type: %s\n",SYMB_TBL[i]->type);
 			return SYMB_TBL[i]->type;
 		}
     }
-    //printf("16.2\n");
     return "NONE";
 }
 char* func_type(char* func_name,scope* current_scope)
@@ -1212,10 +988,6 @@ char* func_type(char* func_name,scope* current_scope)
 	while(temp != NULL)
 	{
 
-		//printf("------------search func on scope lvl: %d --------------\n", temp->scope_lvl);
-		//printf("------------search func on scope address: %d --------------\n", temp);
-		//printf("scope func_name: %s\n",temp->func_name);
-		//printf("scope num of funcs: %d\n",*(temp->num_of_funcs));
 		type = find_func_type(func_name,temp->FUNC_SYMB_TBL,*(temp->num_of_funcs));
 		if(strcmp(type,"NONE"))//not equal
 			return type;
@@ -1229,18 +1001,12 @@ char* func_type(char* func_name,scope* current_scope)
 }
 char* find_func_type(char* func_name, smb_func **FUNC_TBL, int num_of_funcs)
 {
-	//printf("find_func_type\n",num_of_funcs);
-    //printf("num_of_func : %d\n",num_of_funcs);
+
     for(int i=0; i<num_of_funcs ;i++)
     {
-		//printf("i: %d\n",i);
-		//printf("func_name: %s\n",func_name);
-		//printf("FUNC_TBL[i]->return_value: %s\n",FUNC_TBL[i]->return_value);
-		//printf("FUNC_TBL[i]->name: %s\n",FUNC_TBL[i]->name);
 		if(!strcmp(func_name,FUNC_TBL[i]->name))
 		{
-			//printf("FIND FUNC\n");
-			//printf("type: %s\n",FUNC_TBL[i]->return_value);
+
 			return FUNC_TBL[i]->return_value;
 		}
     }
@@ -1267,20 +1033,10 @@ int num_of_params0(char* func_name,scope* current_scope)
 }
 int num_of_params1(char* func_name , smb_func **FUNC_TBL, int num_of_funcs)
 {
-	//printf("--------------------------------------------------------------------------------func num_of_params1\n");
-    //printf("num_of_func : %d\n",num_of_funcs);
-
     for(int i=0; i<num_of_funcs ;i++)
     {
-		//printf("*16.i: %d\n",i);
-		//printf("func_name: %s\n",func_name);
-		//printf("FUNC_TBL[i]->name: %s\n",FUNC_TBL[i]->name);
 		if(!strcmp(func_name,FUNC_TBL[i]->name))
 		{
-			//printf("FIND FUNC\n");
-			//printf("name: %s\n",FUNC_TBL[i]->name);
-			//printf("return_value: %s\n",FUNC_TBL[i]->return_value);
-			//printf("num_of_params: %d\n",*(FUNC_TBL[0]->num_of_params));//*(current_scope->FUNC_SYMB_TBL[*num_of_func]->num_of_params))
 			return *(FUNC_TBL[i]->num_of_params);
 		}
     }
